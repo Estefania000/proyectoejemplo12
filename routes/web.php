@@ -30,7 +30,7 @@ Route::get('/admin', [PaginaController::class, 'administrador'])->name('admin');
 Route::get('/admin/usuario', [PaginaController::class, 'mostrarFormularioUsuario'])->name('admin.usuario');
 Route::post('/admin/guardar-usuario', [PaginaController::class, 'guardarUsuario'])->name('admin.guardar_usuario');
 
-// Excel
+// Excel (Ruta para descargar desde la vista principal de excel)
 Route::get('/admin/excel', [PaginaController::class, 'descargarExcel'])->name('admin.descargarExcel');
 
 // Papeleta individual
@@ -42,7 +42,7 @@ Route::put('/admin/insumos/{id}/no-insumo', [PaginaController::class, 'actualiza
 // Marcar como devuelto (desde admin)
 Route::put('/admin/insumos/{id}/devolver', [PaginaController::class, 'devolver'])->name('admin.devolver');
 
-// 🔧 NUEVAS RUTAS PARA ADMINISTRAR LOS S_INSUMOS:
+// NUEVAS RUTAS PARA ADMINISTRAR LOS S_INSUMOS:
 
 // Vista para asignar número a insumos por solicitud
 Route::get('/admin/solicitud/{id}/asignar-insumos', [PaginaController::class, 'asignarNumerosInsumos'])->name('admin.asignarInsumos');
@@ -53,13 +53,11 @@ Route::post('/admin/solicitud/{id}/guardar-insumos', [PaginaController::class, '
 // Mostrar reporte en HTML
 Route::get('/admin/reporte', [PaginaController::class, 'mostrarReporte'])->name('admin.reporte');
 
-// Descargar Excel
-Route::get('/admin/descargarExcel', [PaginaController::class, 'descargarExcel'])->name('admin.descargarExcel');
-Route::get('/admin/reporte', [PaginaController::class, 'mostrarReporte'])->name('admin.mostrarReporte');
-Route::get('/admin/reporte/descargar', [PaginaController::class, 'descargarExcel'])->name('admin.descargarExcel');
+// Descargar Excel desde el reporte (Se cambió el nombre de la ruta para evitar conflictos)
+Route::get('/admin/reporte/descargar', [PaginaController::class, 'descargarExcel'])->name('admin.descargarReporteExcel');
 
-//solicitud pendiente eliminar
+// Solicitud pendiente eliminar
 Route::delete('/admin/solicitud/{id}/eliminar', [PaginaController::class, 'eliminarSolicitud'])->name('admin.eliminarSolicitud');
 
-//vista excel 
-Route::get('/admin/excel', [PaginaController::class, 'vistaExcel'])->name('admin.excelVista');
+// Vista excel (Formulario para seleccionar año y semestre)
+Route::get('/admin/vista-excel', [PaginaController::class, 'vistaExcel'])->name('admin.excelVista');
