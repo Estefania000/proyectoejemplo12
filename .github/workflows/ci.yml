@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Pipeline y Entrega de Artefactos
 
 on:
   push:
@@ -20,10 +20,10 @@ jobs:
         extensions: mbstring, pdo, pdo_sqlite, sqlite3
         coverage: none
 
-    - name: Copiar archivo de entorno
+    - name: Copiar archivo de entorno para pruebas
       run: cp .env.example .env
 
-    - name: Instalar dependencias de Composer
+    - name: Instalar dependencias
       run: composer install --prefer-dist --no-interaction --no-progress
 
     - name: Generar llave de la aplicación
@@ -34,3 +34,46 @@ jobs:
 
     - name: Ejecutar Pruebas (PHPUnit)
       run: php artisan test
+
+  # NUEVO TRABAJO PARA GENERAR EL ARTEFACTO
+  build-release:
+    needs: laravel-tests # Solo se ejecuta si las pruebas pasan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Solo en la rama principal
+
+    steps:
+    - name: Obtener código
+      uses: actions/checkout@v4
+
+    - name: Configurar PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, pdo, pdo_sqlite, sqlite3
+        coverage: none
+
+    - name: Instalar dependencias de Producción
+      run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+    - name: Preparar archivos para liberación
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+
+    - name: Generar artefacto de liberación
+      run: |
+        tar --exclude='.git' \
+            --exclude='.env' \
+            --exclude='node_modules' \
+            --exclude='storage/logs/*' \
+            -czf laravel-release-v1.0.${{ github.run_number }}.tar.gz .
+
+    - name: Publicar artefacto
+      uses: actions/upload-artifact@v4
+      with:
+        name: laravel-release-v1.0.${{ github.run_number }}
+        path: laravel-release-v1.0.${{ github.run_number }}.tar.gz
+        retention-days: 7
